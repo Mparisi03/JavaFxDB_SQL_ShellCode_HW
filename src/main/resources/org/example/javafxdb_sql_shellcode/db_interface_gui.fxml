@@ -73,7 +73,7 @@
                                    onMouseClicked="#showImage" pickOnBounds="true" preserveRatio="true"
                                    styleClass="profile_pic">
                            <image>
-                              <Image url="@profile.png" />
+                              <Image url="@../../../module03_basicgui_db_interface/profile.png" />
                            </image></ImageView>
                      </children>
                   </AnchorPane>
@@ -128,7 +128,6 @@
       </BorderPane>
    </children>
    <stylesheets>
-      <URL value="@style.css" />
-      <URL value="styling/style.css" />
+      <URL value="src/main/resources/styling/style.css" />
    </stylesheets>
 </AnchorPane>

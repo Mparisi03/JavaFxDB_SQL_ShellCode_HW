@@ -72,6 +72,13 @@ public class Person {
     public void setPassword(String password) {
         this.password = password;
     }
+
+    @Override
+    public String toString() {
+        return "ID: " + id + ", Name: " + Name + ", Email: " + email +
+                ", Phone: " + phone + ", Address: " + address;
+    }
+
 }
 
 

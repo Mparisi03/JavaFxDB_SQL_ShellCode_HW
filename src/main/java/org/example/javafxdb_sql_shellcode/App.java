@@ -6,8 +6,9 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import java.io.IOException;
+import java.util.List;
 import java.util.Scanner;
-import javafx.scene.paint.Color;
+
 import org.example.javafxdb_sql_shellcode.db.ConnDbOps;
 
 /**
@@ -30,7 +31,7 @@ public class App extends Application {
     }
 
     private static Parent loadFXML(String fxml) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource("/module03_basicgui_db_interface/db_interface_gui.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource("/org/example/javafxdb_sql_shellcode/db_interface_gui.fxml"));
         return fxmlLoader.load();
     }
 
@@ -46,6 +47,8 @@ public class App extends Application {
             System.out.println("| To connect to DB,       press 'c' |");
             System.out.println("| To display all users,   press 'a' |");
             System.out.println("| To insert to the DB,    press 'i' |");
+            System.out.println("| To delete from the DB,  press 'd' |");
+            System.out.println("| To update the DB,  press 'u' |");
             System.out.println("| To query by name,       press 'q' |");
             System.out.println("| To exit,                press 'e' |");
             System.out.println("===================================");
@@ -61,7 +64,15 @@ public class App extends Application {
                     cdbop.connectToDatabase(); //Your existing method
                     break;
                 case 'a':
-                    cdbop.listAllUsers(); //all users in DB
+                    List<Person> users = cdbop.listAllUsers(); // Make sure to store the return value
+                    if (users.isEmpty()) {
+                        System.out.println("No users found.");
+                    } else {
+                        // Print the list of users
+                        for (Person user : users) {
+                            System.out.println(user);
+                        }
+                    }
                     break;
 
                 case 'i':
@@ -77,6 +88,27 @@ public class App extends Application {
                     String password = scan.next();
                     cdbop.insertUser(name, email, phone, address, password); //Your insertUser method
                     break;
+                case 'd':
+                    System.out.print("Enter the user ID to delete: ");
+                    int id = scan.nextInt();
+                    cdbop.deleteUser(id);
+                    break;
+                case 'u':
+                    System.out.print("Enter the user ID to update: ");
+                    int newid = scan.nextInt();
+                    System.out.print("Enter new Name: ");
+                    String newName = scan.next();
+                    System.out.print("Enter new Email: ");
+                    String newEmail = scan.next();
+                    System.out.print("Enter new Phone: ");
+                    String newPhone = scan.next();
+                    System.out.print("Enter new Address: ");
+                    String newAddress = scan.next();
+                    System.out.print("Enter new Password: ");
+                    String newPassword = scan.next();
+                    cdbop.updateUser(newid,newName, newEmail, newPhone, newAddress, newPassword);
+                    break;
+
                 case 'q':
                     System.out.print("Enter the name to query: ");
                     String queryName = scan.next();

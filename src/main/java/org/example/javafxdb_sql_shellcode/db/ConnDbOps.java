@@ -153,4 +153,61 @@ public class ConnDbOps {
             e.printStackTrace();
         }
     }
-}
+    public void deleteUser(Integer id) {
+        try{
+            Connection conn = DriverManager.getConnection(DB_URL,USERNAME,PASSWORD);
+            String sql = "DELETE FROM users WHERE id = ?";
+
+            PreparedStatement preparedStatement = conn.prepareStatement(sql);
+            preparedStatement.setInt(1,id);
+
+            int rowsAffected = preparedStatement.executeUpdate();
+
+            // Checking if the deletion was successful
+            if (rowsAffected > 0) {
+                System.out.println("User with ID " + id + " was deleted successfully.");
+            } else {
+                System.out.println("No user found with ID " + id + ".");
+            }
+
+        }catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    public void updateUser(Integer id, String name, String email, String phone, String address, String password) {
+
+
+        try {
+            // Establish a connection to the database
+            Connection conn = DriverManager.getConnection(DB_URL, USERNAME, PASSWORD);
+
+            // SQL query to update user details
+            String sql = "UPDATE users SET name = ?, email = ?, phone = ?, address = ?, password = ? WHERE id = ?";
+
+            // Prepare the statement
+            PreparedStatement preparedStatement = conn.prepareStatement(sql);
+            preparedStatement = conn.prepareStatement(sql);
+            preparedStatement.setString(1, name);
+            preparedStatement.setString(2, email);
+            preparedStatement.setString(3, phone);
+            preparedStatement.setString(4, address);
+            preparedStatement.setString(5, password);
+            preparedStatement.setInt(6, id); // Set the ID of the user you want to update
+
+            // Execute the update query
+            int rowsAffected = preparedStatement.executeUpdate();
+
+            // Check if any rows were updated
+            if (rowsAffected > 0) {
+                System.out.println("User with ID " + id + " was updated successfully.");
+            } else {
+                System.out.println("No user found with ID " + id + ". Update failed.");
+            }
+
+        } catch (SQLException e) {
+            // Handle any SQL exceptions
+            System.out.println("Error updating user: " + e.getMessage());
+            e.printStackTrace();
+        }
+            }
+        }

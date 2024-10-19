@@ -13,6 +13,9 @@ import org.example.javafxdb_sql_shellcode.db.ConnDbOps;
 
 /**
  * JavaFX App
+ * @version
+ * added update and delete to the menu options
+ *
  */
 public class App extends Application {
 
@@ -21,6 +24,7 @@ public class App extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
+
         scene = new Scene(loadFXML("db_interface_gui.fxml"), 640, 480);
         stage.setScene(scene);
         stage.show();
@@ -64,7 +68,7 @@ public class App extends Application {
                     cdbop.connectToDatabase(); //Your existing method
                     break;
                 case 'a':
-                    List<Person> users = cdbop.listAllUsers(); // Make sure to store the return value
+                    List<Person> users = cdbop.listAllUsers();
                     if (users.isEmpty()) {
                         System.out.println("No users found.");
                     } else {
@@ -90,12 +94,14 @@ public class App extends Application {
                     break;
                 case 'd':
                     System.out.print("Enter the user ID to delete: ");
-                    int id = scan.nextInt();
-                    cdbop.deleteUser(id);
+                    int id = scan.nextInt();   //enter the id that needs to change
+                    cdbop.deleteUser(id); //calls deleteUser
                     break;
                 case 'u':
                     System.out.print("Enter the user ID to update: ");
+                    //enter the id that needs to change
                     int newid = scan.nextInt();
+                    //make changes needed
                     System.out.print("Enter new Name: ");
                     String newName = scan.next();
                     System.out.print("Enter new Email: ");
@@ -107,6 +113,7 @@ public class App extends Application {
                     System.out.print("Enter new Password: ");
                     String newPassword = scan.next();
                     cdbop.updateUser(newid,newName, newEmail, newPhone, newAddress, newPassword);
+                    //calls update user
                     break;
 
 

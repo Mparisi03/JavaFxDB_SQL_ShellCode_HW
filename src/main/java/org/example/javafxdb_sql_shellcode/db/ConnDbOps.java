@@ -18,6 +18,9 @@ import java.util.List;
 /**
  *
  * @author MoaathAlrajab
+ * @version
+ * connect to the database
+ * add update and delete
  */
 public class ConnDbOps {
     final String MYSQL_SERVER_URL = "jdbc:mysql://csc311admin.mysql.database.azure.com/";
@@ -147,6 +150,7 @@ public class ConnDbOps {
             int row = preparedStatement.executeUpdate();
             if (row > 0) {
                 System.out.println("A new user was inserted successfully.");
+                System.out.println("Please close to refresh if in GUI");
             }
             preparedStatement.close();
             conn.close();
@@ -156,22 +160,25 @@ public class ConnDbOps {
     }
     public void deleteUser(Integer id) {
         try{
+            // Establish a connection to the database
             Connection conn = DriverManager.getConnection(DB_URL,USERNAME,PASSWORD);
-            String sql = "DELETE FROM users WHERE id = ?";
+            String sql = "DELETE FROM users WHERE id = ?"; //SQL delete user detail
 
             PreparedStatement preparedStatement = conn.prepareStatement(sql);
             preparedStatement.setInt(1,id);
-
+            // Execute the update query
             int rowsAffected = preparedStatement.executeUpdate();
 
             // Checking if the deletion was successful
             if (rowsAffected > 0) {
                 System.out.println("User with ID " + id + " was deleted successfully.");
+                System.out.println("Please close to refresh if in GUI");
             } else {
                 System.out.println("No user found with ID " + id + ".");
             }
 
         }catch (SQLException e) {
+            // Handle any SQL exceptions
             e.printStackTrace();
         }
     }
@@ -182,7 +189,7 @@ public class ConnDbOps {
             // Establish a connection to the database
             Connection conn = DriverManager.getConnection(DB_URL, USERNAME, PASSWORD);
 
-            // SQL query to update user details
+            // SQL update user details
             String sql = "UPDATE users SET name = ?, email = ?, phone = ?, address = ?, password = ? WHERE id = ?";
 
             // Prepare the statement
@@ -201,6 +208,7 @@ public class ConnDbOps {
             // Check if any rows were updated
             if (rowsAffected > 0) {
                 System.out.println("User with ID " + id + " was updated successfully.");
+                System.out.println("Please close to refresh if in GUI");
             } else {
                 System.out.println("No user found with ID " + id + ". Update failed.");
             }

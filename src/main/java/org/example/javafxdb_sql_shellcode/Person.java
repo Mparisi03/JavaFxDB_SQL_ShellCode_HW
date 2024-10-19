@@ -1,7 +1,9 @@
 package org.example.javafxdb_sql_shellcode;
 
 public class Person {
-
+    /**
+     * add the person code but change the variables to match with ConnDbOps
+     */
 
     private Integer id;
     private String Name;

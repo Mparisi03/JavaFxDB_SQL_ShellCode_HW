@@ -19,6 +19,11 @@ import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
 
+/**
+ * copy the code from the ui program, used the primary fxml file for it.
+ * connet it to ConnDbOps
+ * change the variables to match with ConnDbOps
+ */
 
 
 

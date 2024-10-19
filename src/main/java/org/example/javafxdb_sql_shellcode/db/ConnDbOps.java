@@ -4,41 +4,43 @@
  */
 package org.example.javafxdb_sql_shellcode.db;
 
+import org.example.javafxdb_sql_shellcode.Person;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
  * @author MoaathAlrajab
  */
 public class ConnDbOps {
-    final String MYSQL_SERVER_URL = "jdbc:mysql://localhost/";
-    final String DB_URL = "jdbc:mysql://localhost/DBname";
-    final String USERNAME = "admin";
-    final String PASSWORD = "password";
-    
-    public  boolean connectToDatabase() {
+    final String MYSQL_SERVER_URL = "jdbc:mysql://csc311admin.mysql.database.azure.com/";
+    final String DB_URL = "jdbc:mysql://csc311admin.mysql.database.azure.com/DBname";
+    final String USERNAME = "parisi";
+    final String PASSWORD = "zxcvbnm2@";
+
+    public boolean connectToDatabase() {
         boolean hasRegistredUsers = false;
 
-
-        //Class.forName("com.mysql.jdbc.Driver");
         try {
-            //First, connect to MYSQL server and create the database if not created
+            // First, connect to MYSQL server and create the database if not created
             Connection conn = DriverManager.getConnection(MYSQL_SERVER_URL, USERNAME, PASSWORD);
             Statement statement = conn.createStatement();
             statement.executeUpdate("CREATE DATABASE IF NOT EXISTS DBname");
             statement.close();
             conn.close();
 
-            //Second, connect to the database and create the table "users" if cot created
+            // Second, connect to the database and create the table "users" if not created
             conn = DriverManager.getConnection(DB_URL, USERNAME, PASSWORD);
             statement = conn.createStatement();
             String sql = "CREATE TABLE IF NOT EXISTS users ("
-                    + "id INT( 10 ) NOT NULL PRIMARY KEY AUTO_INCREMENT,"
+                    + "id INT(10) NOT NULL PRIMARY KEY AUTO_INCREMENT,"
                     + "name VARCHAR(200) NOT NULL,"
                     + "email VARCHAR(200) NOT NULL UNIQUE,"
                     + "phone VARCHAR(200),"
@@ -47,10 +49,9 @@ public class ConnDbOps {
                     + ")";
             statement.executeUpdate(sql);
 
-            //check if we have users in the table users
+            // Check if we have users in the table
             statement = conn.createStatement();
             ResultSet resultSet = statement.executeQuery("SELECT COUNT(*) FROM users");
-
             if (resultSet.next()) {
                 int numUsers = resultSet.getInt(1);
                 if (numUsers > 0) {
@@ -68,8 +69,9 @@ public class ConnDbOps {
         return hasRegistredUsers;
     }
 
-    public  void queryUserByName(String name) {
-
+    // Query a user by name and return a Person object
+    public Person queryUserByName(String name) {
+        Person person = null;
 
         try {
             Connection conn = DriverManager.getConnection(DB_URL, USERNAME, PASSWORD);
@@ -78,13 +80,14 @@ public class ConnDbOps {
             preparedStatement.setString(1, name);
 
             ResultSet resultSet = preparedStatement.executeQuery();
-
-            while (resultSet.next()) {
+            if (resultSet.next()) {
                 int id = resultSet.getInt("id");
                 String email = resultSet.getString("email");
                 String phone = resultSet.getString("phone");
                 String address = resultSet.getString("address");
-                System.out.println("ID: " + id + ", Name: " + name + ", Email: " + email + ", Phone: " + phone + ", Address: " + address);
+                String password = resultSet.getString("password");
+
+                person = new Person(id, name, email, phone, address, password);
             }
 
             preparedStatement.close();
@@ -92,26 +95,30 @@ public class ConnDbOps {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+
+        return person;
     }
 
-    public  void listAllUsers() {
-
-
+    // List all users from the database and return a list of Person objects
+    public List<Person> listAllUsers() {
+        List<Person> users = new ArrayList<>();
 
         try {
             Connection conn = DriverManager.getConnection(DB_URL, USERNAME, PASSWORD);
-            String sql = "SELECT * FROM users ";
+            String sql = "SELECT * FROM users";
             PreparedStatement preparedStatement = conn.prepareStatement(sql);
 
             ResultSet resultSet = preparedStatement.executeQuery();
-
             while (resultSet.next()) {
                 int id = resultSet.getInt("id");
                 String name = resultSet.getString("name");
                 String email = resultSet.getString("email");
                 String phone = resultSet.getString("phone");
                 String address = resultSet.getString("address");
-                System.out.println("ID: " + id + ", Name: " + name + ", Email: " + email + ", Phone: " + phone + ", Address: " + address);
+                String password = resultSet.getString("password");
+
+                Person person = new Person(id, name, email, phone, address, password);
+                users.add(person);
             }
 
             preparedStatement.close();
@@ -119,11 +126,12 @@ public class ConnDbOps {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+
+        return users;
     }
 
-    public  void insertUser(String name, String email, String phone, String address, String password) {
-
-
+    // Insert a new user into the database
+    public void insertUser(String name, String email, String phone, String address, String password) {
         try {
             Connection conn = DriverManager.getConnection(DB_URL, USERNAME, PASSWORD);
             String sql = "INSERT INTO users (name, email, phone, address, password) VALUES (?, ?, ?, ?, ?)";
@@ -135,7 +143,6 @@ public class ConnDbOps {
             preparedStatement.setString(5, password);
 
             int row = preparedStatement.executeUpdate();
-
             if (row > 0) {
                 System.out.println("A new user was inserted successfully.");
             }
@@ -146,6 +153,4 @@ public class ConnDbOps {
             e.printStackTrace();
         }
     }
-
-    
 }

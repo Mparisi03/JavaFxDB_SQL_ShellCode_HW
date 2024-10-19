@@ -142,11 +142,12 @@ public class ConnDbOps {
             preparedStatement.setString(4, address);
             preparedStatement.setString(5, password);
 
+
+
             int row = preparedStatement.executeUpdate();
             if (row > 0) {
                 System.out.println("A new user was inserted successfully.");
             }
-
             preparedStatement.close();
             conn.close();
         } catch (SQLException e) {

@@ -31,7 +31,7 @@ public class App extends Application {
     }
 
     private static Parent loadFXML(String fxml) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource("/org/example/javafxdb_sql_shellcode/db_interface_gui.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource("/org/example/javafxdb_sql_shellcode/primary.fxml"));
         return fxmlLoader.load();
     }
 
@@ -48,7 +48,7 @@ public class App extends Application {
             System.out.println("| To display all users,   press 'a' |");
             System.out.println("| To insert to the DB,    press 'i' |");
             System.out.println("| To delete from the DB,  press 'd' |");
-            System.out.println("| To update the DB,  press 'u' |");
+            System.out.println("| To update the DB,       press 'u' |");
             System.out.println("| To query by name,       press 'q' |");
             System.out.println("| To exit,                press 'e' |");
             System.out.println("===================================");
@@ -108,6 +108,7 @@ public class App extends Application {
                     String newPassword = scan.next();
                     cdbop.updateUser(newid,newName, newEmail, newPhone, newAddress, newPassword);
                     break;
+
 
                 case 'q':
                     System.out.print("Enter the name to query: ");

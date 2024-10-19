@@ -12,14 +12,18 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.FileChooser;
+import org.example.javafxdb_sql_shellcode.db.ConnDbOps;
 
 import java.io.File;
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 
 
-public class DB_GUI_Controller implements Initializable {
 
+
+public class DB_GUI_Controller implements Initializable {
+    private ConnDbOps cdbop = new ConnDbOps();
     private final ObservableList<Person> data =
             FXCollections.observableArrayList(
                     new Person(1, "mitch","gmail","ffewf","fsfds","fdsfe"),
@@ -43,6 +47,10 @@ public class DB_GUI_Controller implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        List<Person> data = cdbop.listAllUsers();
+          ObservableList<Person> personObservableList = FXCollections.observableArrayList(data);
+        data.clear();
+        data.addAll(data);
         tv_id.setCellValueFactory(new PropertyValueFactory<>("id"));
         tv_n.setCellValueFactory(new PropertyValueFactory<>("name"));
         tv_em.setCellValueFactory(new PropertyValueFactory<>("email"));
@@ -51,7 +59,7 @@ public class DB_GUI_Controller implements Initializable {
         tv_pass.setCellValueFactory(new PropertyValueFactory<>("password"));
 
 
-        tv.setItems(data);
+        tv.setItems(personObservableList);
     }
 
 
@@ -65,6 +73,7 @@ public class DB_GUI_Controller implements Initializable {
                 address.getText(),
                 password.getText()
         );
+        cdbop.insertUser(newPerson.getName(), newPerson.getEmail(), newPerson.getPhone(), newPerson.getAddress(), newPerson.getPassword());
         data.add(newPerson);
         clearForm(); // Reset the form after adding a new record
     }
@@ -76,6 +85,8 @@ public class DB_GUI_Controller implements Initializable {
         phone.clear();
         address.clear();
         password.clear();
+
+
     }
 
     @FXML
@@ -93,6 +104,10 @@ public class DB_GUI_Controller implements Initializable {
             selectedPerson.setPhone(phone.getText());
             selectedPerson.setAddress(address.getText());
             selectedPerson.setPassword(password.getText());
+
+            cdbop.updateUser(selectedPerson.getId(),selectedPerson.getName(),selectedPerson.getEmail(),
+                    selectedPerson.getPhone(),selectedPerson.getAddress(),selectedPerson.getPassword());
+
             data.set(index, selectedPerson); // Update the person in the list
         }
     }
@@ -101,6 +116,7 @@ public class DB_GUI_Controller implements Initializable {
     protected void deleteRecord() {
         Person selectedPerson = tv.getSelectionModel().getSelectedItem();
         if (selectedPerson != null) {
+            cdbop.deleteUser(selectedPerson.getId());
             data.remove(selectedPerson);
         }
     }

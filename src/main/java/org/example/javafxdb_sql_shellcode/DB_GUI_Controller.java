@@ -1,5 +1,6 @@
 package org.example.javafxdb_sql_shellcode;
 
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -96,7 +97,7 @@ public class DB_GUI_Controller implements Initializable {
 
     @FXML
     protected void closeApplication() {
-        System.exit(0);
+        Platform.exit();
     }
 
     @FXML

@@ -6,6 +6,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Scanner;
 
@@ -19,18 +20,17 @@ import org.example.javafxdb_sql_shellcode.db.ConnDbOps;
  */
 public class App extends Application {
 
-    private static Scene scene;
+    private Scene scene;
     private static ConnDbOps cdbop;
 
     @Override
     public void start(Stage stage) throws IOException {
-
         scene = new Scene(loadFXML("db_interface_gui.fxml"), 640, 480);
         stage.setScene(scene);
         stage.show();
     }
 
-    static void setRoot(String fxml) throws IOException {
+     void setRoot(String fxml) throws IOException {
         scene.setRoot(loadFXML(fxml));
     }
 
@@ -41,7 +41,7 @@ public class App extends Application {
 
     public static void main(String[] args) {
         cdbop = new ConnDbOps();
-        Scanner scan = new Scanner(System.in);
+        Scanner scan = new Scanner(System.in, StandardCharsets.UTF_8);
 
         char input;
         do {

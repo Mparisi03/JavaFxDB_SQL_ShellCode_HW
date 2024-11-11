@@ -134,7 +134,6 @@
       </BorderPane>
    </children>
    <stylesheets>
-      <URL value="@../../../../../../../Module03_BasicGUI_DB_Interface_hw7/src/main/resources/com/example/module03_basicgui_db_interface/style.css" />
-      <URL value="@../../../../../../../Module03_BasicGUI_DB_Interface_hw7/src/styling/style.css" />
+      <URL value="file:///C:/Users/paris/IdeaProjects/JavaFxDB_SQL_ShellCode_HW/src/main/resources/styling/style.css" />
    </stylesheets>
 </AnchorPane>

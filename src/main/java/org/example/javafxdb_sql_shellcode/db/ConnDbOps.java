@@ -6,6 +6,9 @@ package org.example.javafxdb_sql_shellcode.db;
 
 import org.example.javafxdb_sql_shellcode.Person;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -14,6 +17,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 /**
  *
@@ -23,61 +27,72 @@ import java.util.List;
  * add update and delete
  */
 public class ConnDbOps {
-    final String MYSQL_SERVER_URL = "jdbc:mysql://csc311admin.mysql.database.azure.com/";
-    final String DB_URL = "jdbc:mysql://csc311admin.mysql.database.azure.com/DBname";
-    final String USERNAME = "parisi";
-    final String PASSWORD = "zxcvbnm2@";
+    final static String MYSQL_SERVER_URL = "jdbc:mysql://csc311admin.mysql.database.azure.com/";
+    final static String DB_URL = "jdbc:mysql://csc311admin.mysql.database.azure.com/DBname";
+   //  final String USERNAME = "parisi";
+   // final String PASSWORD = "qwertyuiop1!";
 
     public boolean connectToDatabase() {
-        boolean hasRegistredUsers = false;
+        boolean hasRegisteredUsers = false;
+        String USERNAME = "";
+        String PASSWORD = "";
 
-        try {
-            // First, connect to MYSQL server and create the database if not created
-            Connection conn = DriverManager.getConnection(MYSQL_SERVER_URL, USERNAME, PASSWORD);
-            Statement statement = conn.createStatement();
-            statement.executeUpdate("CREATE DATABASE IF NOT EXISTS DBname");
-            statement.close();
-            conn.close();
+        // Load credentials from file
+        try (Scanner infile = new Scanner(new File("config_shellcode.txt"), StandardCharsets.UTF_8.name())) {
+        USERNAME = infile.next();
+         PASSWORD = infile.next();
 
-            // Second, connect to the database and create the table "users" if not created
-            conn = DriverManager.getConnection(DB_URL, USERNAME, PASSWORD);
-            statement = conn.createStatement();
-            String sql = "CREATE TABLE IF NOT EXISTS users ("
-                    + "id INT(10) NOT NULL PRIMARY KEY AUTO_INCREMENT,"
-                    + "name VARCHAR(200) NOT NULL,"
-                    + "email VARCHAR(200) NOT NULL UNIQUE,"
-                    + "phone VARCHAR(200),"
-                    + "address VARCHAR(200),"
-                    + "password VARCHAR(200) NOT NULL"
-                    + ")";
-            statement.executeUpdate(sql);
-
-            // Check if we have users in the table
-            statement = conn.createStatement();
-            ResultSet resultSet = statement.executeQuery("SELECT COUNT(*) FROM users");
-            if (resultSet.next()) {
-                int numUsers = resultSet.getInt(1);
-                if (numUsers > 0) {
-                    hasRegistredUsers = true;
-                }
+            // Connect to MySQL server and create the database if not created
+            try (Connection conn = DriverManager.getConnection(MYSQL_SERVER_URL, USERNAME, PASSWORD);
+                 Statement statement = conn.createStatement()) {
+                statement.executeUpdate("CREATE DATABASE IF NOT EXISTS DBname");
             }
 
-            statement.close();
-            conn.close();
+            // Connect to the specific database and create the "users" table if not created
+            try (Connection conn = DriverManager.getConnection(DB_URL, USERNAME, PASSWORD);
+                 Statement statement = conn.createStatement()) {
+                String sql = "CREATE TABLE IF NOT EXISTS users ("
+                        + "id INT(10) NOT NULL PRIMARY KEY AUTO_INCREMENT,"
+                        + "name VARCHAR(200) NOT NULL,"
+                        + "email VARCHAR(200) NOT NULL UNIQUE,"
+                        + "phone VARCHAR(200),"
+                        + "address VARCHAR(200),"
+                        + "password VARCHAR(200) NOT NULL"
+                        + ")";
+                statement.executeUpdate(sql);
 
-        } catch (Exception e) {
+                // Check if we have users in the table
+                try (ResultSet resultSet = statement.executeQuery("SELECT COUNT(*) FROM users")) {
+                    if (resultSet.next()) {
+                        int numUsers = resultSet.getInt(1);
+                        if (numUsers > 0) {
+                            hasRegisteredUsers = true;
+                        }
+                    }
+                }
+            }
+        } catch (SQLException | FileNotFoundException e) {
             e.printStackTrace();
+            throw new RuntimeException(e);
         }
 
-        return hasRegistredUsers;
+        return hasRegisteredUsers;
     }
+
 
     // Query a user by name and return a Person object
     public Person queryUserByName(String name) {
         Person person = null;
+        Connection conn = null;
+        String USERNAME = "";
+        String PASSWORD = "";
 
         try {
-            Connection conn = DriverManager.getConnection(DB_URL, USERNAME, PASSWORD);
+
+            Scanner infile = new Scanner(new File("config_shellcode.txt"), StandardCharsets.UTF_8.name());
+            USERNAME = infile.next();
+            PASSWORD = infile.next();
+            conn = DriverManager.getConnection(DB_URL, USERNAME, PASSWORD);
             String sql = "SELECT * FROM users WHERE name = ?";
             PreparedStatement preparedStatement = conn.prepareStatement(sql);
             preparedStatement.setString(1, name);
@@ -95,9 +110,12 @@ public class ConnDbOps {
 
             preparedStatement.close();
             conn.close();
-        } catch (SQLException e) {
+        } catch (SQLException |FileNotFoundException e) {
             e.printStackTrace();
+            throw new RuntimeException(e);
         }
+
+
 
         return person;
     }
@@ -105,9 +123,16 @@ public class ConnDbOps {
     // List all users from the database and return a list of Person objects
     public List<Person> listAllUsers() {
         List<Person> users = new ArrayList<>();
+        Connection conn = null;
+        String USERNAME = "";
+        String PASSWORD = "";
 
         try {
-            Connection conn = DriverManager.getConnection(DB_URL, USERNAME, PASSWORD);
+
+            Scanner infile = new Scanner(new File("config_shellcode.txt"), StandardCharsets.UTF_8.name());
+            USERNAME = infile.next();
+            PASSWORD = infile.next();
+           conn = DriverManager.getConnection(DB_URL, USERNAME, PASSWORD);
             String sql = "SELECT * FROM users";
             PreparedStatement preparedStatement = conn.prepareStatement(sql);
 
@@ -126,8 +151,9 @@ public class ConnDbOps {
 
             preparedStatement.close();
             conn.close();
-        } catch (SQLException e) {
+        } catch (SQLException |FileNotFoundException e) {
             e.printStackTrace();
+            throw new RuntimeException(e);
         }
 
         return users;
@@ -135,8 +161,16 @@ public class ConnDbOps {
 
     // Insert a new user into the database
     public void insertUser(String name, String email, String phone, String address, String password) {
+        Connection conn = null;
+        String USERNAME = "";
+        String PASSWORD = "";
+
         try {
-            Connection conn = DriverManager.getConnection(DB_URL, USERNAME, PASSWORD);
+
+            Scanner infile = new Scanner(new File("config_shellcode.txt"), StandardCharsets.UTF_8.name());
+            USERNAME = infile.next();
+            PASSWORD = infile.next();
+            conn = DriverManager.getConnection(DB_URL, USERNAME, PASSWORD);
             String sql = "INSERT INTO users (name, email, phone, address, password) VALUES (?, ?, ?, ?, ?)";
             PreparedStatement preparedStatement = conn.prepareStatement(sql);
             preparedStatement.setString(1, name);
@@ -154,69 +188,84 @@ public class ConnDbOps {
             }
             preparedStatement.close();
             conn.close();
-        } catch (SQLException e) {
+        } catch (SQLException |FileNotFoundException e) {
             e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
     public void deleteUser(Integer id) {
-        try{
+
+        String USERNAME = "";
+        String PASSWORD = "";
+
+        try (Scanner infile = new Scanner(new File("config_shellcode.txt"), StandardCharsets.UTF_8.name())){
+            USERNAME = infile.next();
+            PASSWORD = infile.next();
             // Establish a connection to the database
-            Connection conn = DriverManager.getConnection(DB_URL,USERNAME,PASSWORD);
-            String sql = "DELETE FROM users WHERE id = ?"; //SQL delete user detail
+            try(Connection conn = DriverManager.getConnection(DB_URL,USERNAME,PASSWORD);
+                //SQL delete user detail
+                PreparedStatement preparedStatement = conn.prepareStatement("DELETE FROM users WHERE id = ?")) {
+                preparedStatement.setInt(1, id);
+                // Execute the update query
+                int rowsAffected = preparedStatement.executeUpdate();
 
-            PreparedStatement preparedStatement = conn.prepareStatement(sql);
-            preparedStatement.setInt(1,id);
-            // Execute the update query
-            int rowsAffected = preparedStatement.executeUpdate();
-
-            // Checking if the deletion was successful
-            if (rowsAffected > 0) {
-                System.out.println("User with ID " + id + " was deleted successfully.");
-                System.out.println("Please close to refresh if in GUI");
-            } else {
-                System.out.println("No user found with ID " + id + ".");
+                // Checking if the deletion was successful
+                if (rowsAffected > 0) {
+                    System.out.println("User with ID " + id + " was deleted successfully.");
+                    System.out.println("Please close to refresh if in GUI");
+                } else {
+                    System.out.println("No user found with ID " + id + ".");
+                }
+            }catch(SQLException e) {
+                e.printStackTrace();
+                throw new RuntimeException(e);
             }
 
-        }catch (SQLException e) {
-            // Handle any SQL exceptions
+        } catch (FileNotFoundException e) {
             e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
     public void updateUser(Integer id, String name, String email, String phone, String address, String password) {
 
+        String USERNAME = "";
+        String PASSWORD = "";
 
-        try {
+        try (Scanner infile = new Scanner(new File("config_shellcode.txt"), StandardCharsets.UTF_8.name())){
+            USERNAME = infile.next();
+            PASSWORD = infile.next();
             // Establish a connection to the database
-            Connection conn = DriverManager.getConnection(DB_URL, USERNAME, PASSWORD);
+            try(Connection conn = DriverManager.getConnection(DB_URL, USERNAME, PASSWORD);
 
             // SQL update user details
-            String sql = "UPDATE users SET name = ?, email = ?, phone = ?, address = ?, password = ? WHERE id = ?";
 
             // Prepare the statement
-            PreparedStatement preparedStatement = conn.prepareStatement(sql);
-            preparedStatement = conn.prepareStatement(sql);
-            preparedStatement.setString(1, name);
-            preparedStatement.setString(2, email);
-            preparedStatement.setString(3, phone);
-            preparedStatement.setString(4, address);
-            preparedStatement.setString(5, password);
-            preparedStatement.setInt(6, id); // Set the ID of the user you want to update
+            PreparedStatement preparedStatement = conn.prepareStatement("UPDATE users SET name = ?, email = ?, phone = ?, address = ?, password = ? WHERE id = ?")) {
+                preparedStatement.setString(1, name);
+                preparedStatement.setString(2, email);
+                preparedStatement.setString(3, phone);
+                preparedStatement.setString(4, address);
+                preparedStatement.setString(5, password);
+                preparedStatement.setInt(6, id); // Set the ID of the user you want to update
 
-            // Execute the update query
-            int rowsAffected = preparedStatement.executeUpdate();
+                // Execute the update query
+                int rowsAffected = preparedStatement.executeUpdate();
 
-            // Check if any rows were updated
-            if (rowsAffected > 0) {
-                System.out.println("User with ID " + id + " was updated successfully.");
-                System.out.println("Please close to refresh if in GUI");
-            } else {
-                System.out.println("No user found with ID " + id + ". Update failed.");
+                // Check if any rows were updated
+                if (rowsAffected > 0) {
+                    System.out.println("User with ID " + id + " was updated successfully.");
+                    System.out.println("Please close to refresh if in GUI");
+                } else {
+                    System.out.println("No user found with ID " + id + ". Update failed.");
+                }
             }
 
-        } catch (SQLException e) {
+        } catch (SQLException |FileNotFoundException e) {
             // Handle any SQL exceptions
             System.out.println("Error updating user: " + e.getMessage());
             e.printStackTrace();
+            throw new RuntimeException(e);
+
         }
             }
         }
